@@ -3,6 +3,7 @@ const auth= require("../authen/user_authen.js")
 const router= require('express').Router()
 
 router.post('/signup',userservice.adduser)
-router.get('/login',userservice.getuser)
-router.get('/check',userservice.login)
+router.get('/getuser',auth.authenticateToken,userservice.getuser)
+router.post('/login',userservice.login)
+router.put('/update/:id',userservice.profileupdate)
 module.exports=router
