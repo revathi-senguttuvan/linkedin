@@ -124,9 +124,24 @@ const profileupdate = async (req, res) => {
     }
 }
 
+const connect=async(req,res)=>{
+    try{
+        let Email=req.body.Email;
+        let result = await  Users.query().findOne({Email:Email}).update(req.body)
+        res.status(200).send({ status: 200, message: "User Data Updated Successfully", data: result })
+
+        
+
+    }
+    catch (err) {
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+    }
+}
+
 module.exports={
     adduser,
     getuser,
     login,
-    profileupdate
+    profileupdate,
+    connect
 }
