@@ -8,6 +8,8 @@ router.post('/login',userservice.login)
 router.put('/update/:id',userservice.profileupdate)
 
 router.put('/connect',userservice.connect)
+router.get('/find',userservice.find)
+
 
 
 module.exports=router
