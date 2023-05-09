@@ -59,11 +59,11 @@ const adduser=async(req,res)=>{
 
 const getuser = async (req, res) => {
     try {
-       const detail = await Users.query()
-       res.status(200).send(detail)
- 
- 
-    }
+        // let Public=req.body.Public;
+        
+            const detail =  await Users.query().where('Public','yes')
+            res.status(200).send(detail)
+        }
     catch (err) {
        res.status(404).send(JSON.stringify("API response", err))
  
@@ -138,6 +138,12 @@ const connect=async(req,res)=>{
     }
 }
 
+const notification=async(req,res)=>{
+    
+}
+
+
+
 const find=async(req,res)=>{
     try{
         let Email=req.body.Email;
@@ -151,6 +157,10 @@ const find=async(req,res)=>{
         res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
 }
+
+
+
+
 
 
 
