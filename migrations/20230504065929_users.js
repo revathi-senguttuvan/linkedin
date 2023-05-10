@@ -25,6 +25,7 @@ exports.up = function(knex) {
         table.string("Role").defaultTo("user");
         table.bigInteger("Phone Number");
         table.integer("Connect");
+        table.integer('OTP')
         table.timestamp('created_at').defaultTo(knex.fn.now())
         table.timestamp('updated_at').defaultTo(knex.fn.now())
 
