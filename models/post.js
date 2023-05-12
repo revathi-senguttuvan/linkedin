@@ -15,7 +15,7 @@ class Users extends Model{
                 
                 Text: { type: 'string' },
                 JobTitle: { type: 'string' },
-                JobPosition: { type: 'string' },
+                JobPosition: { type: 'integer' },
                 Experience: { type: 'integer' },
                 Description: { type: 'string' },
                 link: { type: 'string' },

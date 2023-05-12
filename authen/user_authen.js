@@ -28,7 +28,7 @@ exports.authenticateToken = (req, res, next) => {
                
             })
 
-                if (jwt_role.Role == "user") {
+                if (jwt_role.Role == "admin") {
                     next();
                 }
                 else {

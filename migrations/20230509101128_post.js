@@ -8,10 +8,11 @@ exports.up = function (knex) {
         table.integer("users_id").unsigned();
         table.string("Text");
         table.string("JobTitle");
-        table.string("JobPosition");
+        table.integer("JobPosition");
         table.integer("Experience");
         table.string("Description");
-
+        table.string("Email");
+        table.string('image');
         table.string("link");
         table.integer("no_of_persons");
         table.timestamp('created_at').defaultTo(knex.fn.now())

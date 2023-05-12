@@ -3,15 +3,21 @@
  * @returns { Promise<void> }
  */
 exports.up = function(knex) {
-    return knex.schema.createTable("jobapplied", table => {
+    return knex.schema.createTable("connection", table => {
         table.increments("id").primary();
-        table.integer("users_id").unsigned();
-        table.integer("post_id").unsigned();
-        table.string('Email');
-        table.string('Status')
+       
+        table.integer('personid').unsigned();
+        table.integer('connectedto').unsigned();
+        table.integer('requestedto').unsigned();
+        table.string('personmail');
+        table.string('invitemail');
+        table.string('accepted');
+        table.string('rejected');
+        table.string('connect');
         table.timestamp('created_at').defaultTo(knex.fn.now())
         table.timestamp('updated_at').defaultTo(knex.fn.now())
     });
+
   
 };
 
@@ -20,6 +26,5 @@ exports.up = function(knex) {
  * @returns { Promise<void> }
  */
 exports.down = function(knex) {
-    return knex.schema.dropTable("job applied");
   
 };

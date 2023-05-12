@@ -13,19 +13,21 @@ exports.up = function(knex) {
         table.string("Country");
         table.string("District");
         table.string("Public").defaultTo("yes");
-        table.integer("SSLC Percentage");
-        table.integer("SSLC PassedOutYear");
-        table.integer("HSC Percentage");
-        table.integer("HSC PassedOutYear");
-        table.integer("College Percentage");
-        table.integer("College PassedOutYear");
-        table.integer("Work Experience");
+        table.integer("SSLCPercentage");
+        table.integer("SSLCPassedOutYear");
+        table.integer("HSCPercentage");
+        table.integer("HSCPassedOutYear");
+        table.integer("CollegePercentage");
+        table.integer("CollegePassedOutYear");
+        table.integer("WorkExperience");
+        table.integer("Jobsapplied");
         table.string("Job");
         table.string("Company");
         table.string("Role").defaultTo("user");
         table.bigInteger("Phone Number");
         table.integer("Connect");
-        table.integer('OTP')
+        table.integer('OTP');
+        table.string('block')
         table.timestamp('created_at').defaultTo(knex.fn.now())
         table.timestamp('updated_at').defaultTo(knex.fn.now())
 
