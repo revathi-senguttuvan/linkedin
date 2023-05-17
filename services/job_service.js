@@ -1,9 +1,9 @@
-const job=require("../models/job");
-const post=require("../models/post");
-const Users = require("../models/user");    
+const job = require("../models/job");
+const post = require("../models/post");
+const Users = require("../models/user");
 const nodemailer = require('nodemailer');
 
-
+//send email
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -16,23 +16,23 @@ function sendmail(toMail, jobdetail) {
         from: 'revathi@xponential.digital',
         to: toMail,
         subject: 'New Account created',
-        text: `JOb Applicant detail: ${jobdetail.Email+"\n firstname:"+jobdetail.FirstName
-        +"\n LastName:"+jobdetail.LastName+"\n Country:"+jobdetail.Country
-        +"\n District:"+jobdetail.District
-        +"\n SSLCPercentage:"+jobdetail.SSLCPercentage
-        +"\n SSLCPassedOutYear:"+jobdetail.SSLCPassedOutYear
-        +"\n SSLCPassedOutYear:"+jobdetail.HSCPercentage
-        +"\n SSLCPassedOutYear:"+jobdetail.HSCPassedOutYear
-        +"\n SSLCPassedOutYear:"+jobdetail.CollegePercentage
-        +"\n SSLCPassedOutYear:"+jobdetail.CollegePassedOutYear
-        +"\n SSLCPassedOutYear:"+jobdetail.CollegePassedOutYear
-        +"\n WorkExperience:"+jobdetail.WorkExperience
-        +"\n Job:"+jobdetail.Job
-        +"\n Company:"+jobdetail.Company
-    
-    
-    
-    }`
+        text: `JOb Applicant detail: ${jobdetail.Email + "\n firstname:" + jobdetail.FirstName
+            + "\n LastName:" + jobdetail.LastName + "\n Country:" + jobdetail.Country
+            + "\n District:" + jobdetail.District
+            + "\n SSLCPercentage:" + jobdetail.SSLCPercentage
+            + "\n SSLCPassedOutYear:" + jobdetail.SSLCPassedOutYear
+            + "\n SSLCPassedOutYear:" + jobdetail.HSCPercentage
+            + "\n SSLCPassedOutYear:" + jobdetail.HSCPassedOutYear
+            + "\n SSLCPassedOutYear:" + jobdetail.CollegePercentage
+            + "\n SSLCPassedOutYear:" + jobdetail.CollegePassedOutYear
+            + "\n SSLCPassedOutYear:" + jobdetail.CollegePassedOutYear
+            + "\n WorkExperience:" + jobdetail.WorkExperience
+            + "\n Job:" + jobdetail.Job
+            + "\n Company:" + jobdetail.Company
+
+
+
+            }`
     };
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
@@ -43,61 +43,92 @@ function sendmail(toMail, jobdetail) {
     });
 }
 
+//apply for a job and send applicant details through mail
+const jobapplied = async (req, res) => {
+    try {
+        let detail = {
+            users_id: req.body.users_id,
+            post_id: req.body.post_id,
+            Email: req.body.Email,
+            Status: req.body.Status
 
-const jobapplied=async(req,res)=>{
-    try{
-        let detail={
-            users_id:req.body.users_id,
-            post_id:req.body.post_id,
-            Email:req.body.Email,
-            Status:req.body.Status
-    
         }
-        const data=await job.query().insert(detail);
-        users_id=detail.users_id
+        const user2 = await post.query().findById(detail.post_id)
+        const find = await job.query().findOne({ post_id: detail.post_id })
+        console.log(find)
        
-        
-      
-        
-        const user1= await post.query().findById(detail.post_id)
-        user1.no_of_persons=user1.no_of_persons+1
-        console.log(user1.Email)
+        if (user2.users_id != detail.users_id) {
+            if (find.Email != detail.Email) {
+                if (user2.JobPosition != user2.no_of_persons) {
+                    console.log(user2.JobPosition)
+                    console.log(user2.no_of_persons)
+                    console.log(user2.JobPosition != user2.no_of_persons)
+                    console.log(user2.JobPosition == user2.no_of_persons)
 
-        const sendmsg=await Users.query().findById(detail.users_id)
-        
-        
-        
+                    console.log(user2.no_of_persons >= user2.JobPosition)
+                    console.log(user2.no_of_persons <= user2.JobPosition)
 
-        sendmail(user1.Email,sendmsg);
-        console.log(sendmsg)
-   
+                    const data = await job.query().insert(detail);
+                    users_id = detail.users_id
 
-    const user= await post.query().findById(detail.post_id).update(user1)
-        res.status(200).send({ status: 200, message: "Data added success!", data:data })
 
+
+
+                    const user1 = await post.query().findById(detail.post_id)
+                    user1.no_of_persons = user1.no_of_persons + 1
+                    console.log(user1.Email)
+
+                    const sendmsg = await Users.query().findById(detail.users_id)
+
+
+
+
+                    sendmail(user1.Email, sendmsg);
+                    console.log(sendmsg)
+
+
+                    const user = await post.query().findById(detail.post_id).update(user1)
+                    res.status(200).send({ status: 200, message: "Data added success!", data: data })
+                    res.status(200).send({ status: 200, message: "Data added success!" })
+
+                }
+                else {
+                    res.status(200).send({ status: 200, message: "Opening's are closed" })
+
+                }
+            }
+            else {
+                res.status(200).send({ status: 200, message: "Already applied" })
+
+            }
+        }
+        else {
+            res.status(200).send({ status: 200, message: "Invalid inputs" })
+
+        }
+    }
+    catch (err) {
+      res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
-    catch(err){
-        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+}
+
+
+//get applicants details from the job_postid
+const getapplicantdetails = async (req, res) => {
+    let basic = {
+        post_id: req.body.post_id
 
     }
-  
+    const find = await job.query().where('post_id', req.body.post_id)
+    res.status(200).send({ status: 200, message: "Data added success!", data: find })
 
 }
 
-const getapplicantdetails=async(req,res)=>{
-    let basic={
-        post_id:req.body.post_id
-        
-    }
-    const find= await job.query().where('post_id',req.body.post_id)
-    res.status(200).send({ status: 200, message: "Data added success!", data:find })
-
-}
 
 
 
-module.exports={
+module.exports = {
     jobapplied,
     getapplicantdetails
 }

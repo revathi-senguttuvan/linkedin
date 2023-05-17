@@ -11,7 +11,7 @@ router.put('/update/:id',userservice.profileupdate)
 router.put('/private',userservice.public)
 router.get('/find',userservice.find)
 router.put('/block',userservice.block)
-// router.put('/emailchangeotp',userservice.emailverify)
+router.put('/profileupload/:id',userservice.image)
 
 
 

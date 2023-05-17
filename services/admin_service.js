@@ -1,14 +1,17 @@
 const Users = require("../models/user");
+const post = require("../models/post");
+const job = require("../models/job");
+const connect= require("../models/connect");
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
 
+//OTP generation
 var digits = '0123456789';
 let OTP = '';
 for (let i = 0; i < 4; i++) {
     OTP += digits[Math.floor(Math.random() * 10)];
 }
-
-
+//mail generation
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -32,8 +35,7 @@ function sendmail(toMail, otp) {
         }
     });
 }
-
-
+//addadmin
 const addadmin = async (req, res) => {
     const password = await bcrypt.hash(req.body.Password, 6)
     try {
@@ -49,17 +51,15 @@ const addadmin = async (req, res) => {
         const data = await Users.query().insert(basic)
         sendmail(req.body.Email, OTP);
         res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
-
     }
     catch (err) {
-        console.log("err", err)
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
-
 }
 
+//verify
 const successfullsign = async (req, res) => {
-    
     try {
         let basic = {
             Email: req.body.Email,
@@ -85,16 +85,40 @@ const successfullsign = async (req, res) => {
         }
     }
     catch (err){
-        res.status(404).send(JSON.stringify("API response", err))
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
 }
 
+//deleteuser
+const deltuser = async (req, res) => {
+   try {
+    let basic = {
+            Email: req.body.Email,
+            id:req.body.id
+        }
+        const data1=await post.query().where({users_id:basic.id}).delete()
+        console.log(data1)
+        const data2=await job.query().where({users_id:basic.id}).delete()
+        console.log(data2)
+        const data3=await connect.query().where({personid:basic.id}).delete()
+        console.log(data3)
+        const data44=await connect.query().where({requestedto:basic.id}).delete()
+        console.log(data44)
+        const data4=await Users.query().where({id:basic.id}).delete()
+        console.log(data4)
+        res.status(200).send({ status: 200, message: "user has been deleted" });
 
+    }
+    catch (err) {
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
+    }
 
+}
 
 module.exports={
     addadmin,
-    successfullsign
+    successfullsign,
+    deltuser
 }

@@ -2,7 +2,7 @@ const connect = require("../models/connect.js");
 const Users = require("../models/user");
 const nodemailer = require('nodemailer');
 
-
+//send mail
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -46,7 +46,7 @@ function sendmail(toMail, jobdetail) {
 }
 
 
-
+//connect request
 const connect1 = async (req, res) => {
     try {
         let basic = {
@@ -56,10 +56,13 @@ const connect1 = async (req, res) => {
             invitemail: req.body.invitemail,
             connect: req.body.connect,
         }
-        const blockeduser1 = await Users.query().findOne({ Email: basic.invitemail })
-        if (blockeduser1.Email == basic.invitemail) {
-            if (blockeduser1.block == null) {
-                if (blockeduser1.Public == 'yes') 
+        const finduser1 = await Users.query().findOne({ id:basic.requestedto })
+        console.log(finduser1.Email)
+
+        if (finduser1.Email == basic.invitemail) {
+            if (finduser1.block == '') 
+            {
+                if (finduser1.Public == 'yes') 
                 {
                     const data = await connect.query().insert(basic);
                     const usr = await Users.query().findById(basic.personid)
@@ -69,17 +72,21 @@ const connect1 = async (req, res) => {
                     console.log(sendmsg)
 
 
-                    sendmail(usr.Email, sendmsg);
+                    sendmail(basic.invitemail, usr);
 
                     console.log(data)
-                    res.status(200).send({ status: 200, message: "Data added success!", data: data })
+                    res.status(200).send({ status: 200, message: "successfully connected", data: data })
 
 
                 }
                 else{
-                    res.status(404).send({ status: 404, message: "User is not available" })
+                    res.status(404).send({ status: 404, message: "The user is private" })
 
                 }
+
+            }
+            else{
+                res.status(404).send({ status: 404, message: "User is  blocked" })
 
             }
 
@@ -90,66 +97,48 @@ const connect1 = async (req, res) => {
             res.status(404).send({ status: 404, message: "User is not available" })
 
         }
-
-
-
-
-
-
-
     }
-    catch (err) {
-        // res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
-        console.log(err)
-
+    catch (err) 
+    {
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
-
-
-
-
 }
 
-const getconnect = async (req, res) => {
-    let basic = {
-       
+//connected person details 
+const getconnect = async (req, res) => 
+{
+    let basic=
+    {
         personid:req.body.personid
-
     }
     const find = await connect.query().findOne({personid:basic.personid}).where('connect', 'connect')
     res.status(200).send({ status: 200, message: "connect given persons", data: find })
-
 }
 
-
-const getaccept = async (req, res) => {
+//list of accepted people
+const getaccept = async (req, res) =>{
     let basic = {
-       
-        personid:req.body.personid
-
+       personid:req.body.personid
     }
-    // const find1= await connect.query().findOne({personid:basic.personid})
-    // if(find1.accept=="accept")
     const find = await connect.query().findOne({personid:basic.personid}).where('accepted', 'accept')
     res.status(200).send({ status: 200, message: "List of accepted persons", data: find })
 
 }
 
-
+//accept the connect request
 const accept = async (req, res) => {
     try {
-        let basic = {
+        let basic =
+        {
             requestedto: req.body.requestedto,
-
             accepted: req.body.accepted,
-
         }
-        const data = await connect.query().findOne({
+        const data = await connect.query().findOne
+        ({
             requestedto: basic.requestedto
-
         })
         console.log(data)
         data.connect = null;
-        
         data.connectedto=data.requestedto
         data.requestedto=null;
         data.accepted=basic.accepted;
@@ -162,47 +151,13 @@ const accept = async (req, res) => {
 
         }).update(req.body)
         res.status(200).send({ status: 200, message: "Data added success!", data: fild })
-
-
-        // const find1= await connect.query().findOne({
-        //     requestedto:basic.requestedto
-
-        // })
-        // console.log(find1)
-        // find1.connect=''
-        // if(find1.accepted=="accept"){
-        //     let basic={
-        //         connect:""
-
-        //     }
-
-        //     const up= await connect.query().findOne({
-        //         requestedto:basic.requestedto
-
-        //     }).update(basic);
-        //     console.log(up)
-
-        //     res.status(200).send({ status: 200, message: "Data added success!", data:up })
-
-
-        // }
-        // else{
-        //     res.status(404).send({ status: 404, message: "Data not added!"})
-
-        // }
-
     }
     catch (err) {
-        // res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
-        console.log(err)
-
-    }
-
-
-
-
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+       }
 }
 
+//reject a connect request
 const reject = async (req, res) => {
     try {
         let basic = {
@@ -226,19 +181,13 @@ const reject = async (req, res) => {
 
         }).update(req.body)
         res.status(200).send({ status: 200, message: "Data added success!", data: fild })
-
-
-       
-
     }
     catch (err) {
-       
-        console.log(err)
-
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
-
 }
 
+//reconnect with a person
 const reconnect = async (req, res) => {
     try {
         let basic = {
@@ -264,36 +213,11 @@ const reconnect = async (req, res) => {
 
         }
         res.status(200).send({ status: 200, message: "not added"})
-       
-        
-        
-        // const fild = await connect.query().findOne({
-        //     requestedto: basic.requestedto
-
-        // }).update(data)
-        // const fild2 = await connect.query().findOne({
-        //     requestedto: basic.requestedto
-
-        // }).update(req.body)
-        
-
-
-       
-
     }
     catch (err) {
-       
-        console.log(err)
-
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
-
 }
-
-
-
-
-
-
 
 module.exports = {
     connect1,

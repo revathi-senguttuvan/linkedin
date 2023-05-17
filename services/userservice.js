@@ -2,7 +2,8 @@ const Users = require("../models/user");
 const jwt = require("jsonwebtoken")
 secretkey = "secretkey"
 const bcrypt = require("bcrypt");
-const multer=require('multer')
+const multer = require('multer');
+const path = require('path');
 const nodemailer = require('nodemailer');
 
 
@@ -14,6 +15,7 @@ for (let i = 0; i < 4; i++) {
 }
 
 
+//send email
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -64,7 +66,7 @@ const adduser = async (req, res) => {
 
     }
     catch (err) {
-        console.log("err", err)
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
 
@@ -99,36 +101,16 @@ const successfullsign = async (req, res) => {
         }
     }
     catch (err){
-        res.status(404).send(JSON.stringify("API response", err))
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
 }
 
-//See all users who all are public
+//See all users who all are public except blocked users
 const getuser = async (req, res) => {
     try {
         const detail1 = await Users.query().where('block',null);
-    //     let data=[{
-    //     id:detail1.id,
-    //     detail1.Email,
-    //     detail1.Password,
-    //     detail1.UserName,
-    //     detail1.FirstName,
-    //     detail1.LastName,
-    //     detail1.Country,
-    //     detail1.District,
-    //     detail1.SSLCPercentage,
-    //     detail1.SSLCPassedOutYear,
-    //     detail1.HSCPercentage,
-    //     detail1.HSCPassedOutYear,
-    //     detail1.CollegePercentage,
-    //     detail1.CollegePassedOutYear,
-    //     detail1.WorkExperience,
-    //     detail1.Jobsapplied,
-    //     detail1.Job,
-    //     detail1.Company
-    // }]
-       res.status(200).send({ status: 200, message: "Available users",data:detail1 });
+        res.status(200).send({ status: 200, message: "Available users",data:detail1});
     }
     catch (err) {
         res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
@@ -173,7 +155,7 @@ const login = async (req, res) => {
      
              }
      
-             res.status(403).send({ status: 403, message: "Enter a valid Username and Password" });
+             res.status(404).send({ status: 404, message: "Enter a valid Username and Password" });
 
         }
         
@@ -181,7 +163,7 @@ const login = async (req, res) => {
 
     }
     catch (err) {
-        res.status(404).send(JSON.stringify("API response", err))
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
 
 
@@ -200,7 +182,7 @@ const public=async(req,res)=>{
 
     }
     catch(err){
-        res.status(404).send(JSON.stringify("API response"+err))
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
     
@@ -237,94 +219,8 @@ const profileupdate = async (req, res) => {
 }
 
 
-// const emailverify = async (req, res) => {
-//     const password = await bcrypt.hash(req.body.Password, 6)
-//     try {
 
-//         let basic = {
-//             id:req.body.id,
-//             Email: req.body.Email,
-//             OTP: OTP
-//         }
-//         const data = await Users.query().findById(basic.id).update(req.body.OTP)
-        
-//         sendmail(req.body.Email, OTP);
-//         res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
-
-//     }
-//     catch (err) {
-//         console.log("err", err)
-
-//     }
-
-// }
-
-// const emailsuccesschange = async (req, res) => {
-//     const password = await bcrypt.hash(req.body.Password, 6)
-//     try {
-
-//         let basic = {
-//             Email: req.body.Email,
-//             OTP: OTP
-//         }
-        
-//         sendmail(req.body.Email, OTP);
-//         res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
-
-//     }
-//     catch (err) {
-//         console.log("err", err)
-
-//     }
-
-// }
-
-
-
-
-
-
-
-
-
-
-
-// incomplet 
-// const connect = async (req, res) => {
-//     try {
-
-//         let Email=req.body.Email;
-
-//         let result1 = await Users.query().findOne({ Email: Email });
-//         result1.Connect=result1.Connect+1
-
-//         if(result1.Public=="yes"){
-
-//             let result = await Users.query().findOne({ Email: Email }).update(result1)
-//             res.status(200).send({ status: 200, message: "User connected", data: result })
-
-//         }
-//         else{
-//             res.status(200).send({ status: 200, message: "User is not public" })
-
-//         }
-        
-
-        
-        
-        
-//     }
-//     catch (err) {
-//         res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
-//     }
-// }
-
-// const notification = async (req, res) => {
-
-// }
-
-
-
+//find specific user
 const find = async (req, res) => {
     try {
         let Email = req.body.Email;
@@ -340,6 +236,7 @@ const find = async (req, res) => {
 }
 
 
+//block a user
 const block = async (req, res) => {
     try {
         let basic={
@@ -360,16 +257,73 @@ const block = async (req, res) => {
 
 
 
+//file storage
+let extn;
+let Email;
+
+
+const storage = multer.diskStorage({
+    destination: 'images',
+    filename: function (req, file, cb) {
+        cb(null, Email+new Date().toISOString().replace(/:/g, "-") + path.extname(file.originalname));
+        extn = path.extname(file.originalname)
+    }
+})
+const maxSize = 100000 * 1000 * 1000;
+const upload = multer({
+    storage: storage,
+    limits: { fileSize: maxSize },
+    fileFilter: function (req, file, callb) {
+        const filetypes = /jpeg|jpg|png|pdf/;
+        const mimetype = filetypes.test(file.mimetype);
+        const extname1 = filetypes.test(path.extname(file.originalname).toLowerCase());
+        if (mimetype && extname1) {
+            return callb(null, true);
+        }
+        callb(structure(null, "Uploaded file not similar to JPEG,JPG PNG,PDF", 404))
+    }
+}).single('myimage')
+
+
+const image = async (req, res) => {
+
+
+    try {
 
 
 
+        upload(req, res, async function (err) {
+            if (err) {
+                res.send(err);
+            }
+            else {
+                let basic = {
+                    id:Number(req.params.id),
+                    
+                    profile: req.body.Email +new Date() + extn,
+                    
+                }
+                console.log(basic)
+                if (extn != null) {
+                    let result = await Users.query().findOne({id:req.params.id}).update(basic)
+                    res.status(200).send({ status: 200, message: "image added Successfully", data: result })
+
+                }
+                else {
+                    res.status(404).send({ status: 404, message: "No image added " })
 
 
+                }
+            }
+        })
+    }
+    catch (err) {
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+
+    }
 
 
-
-
-
+}
 
 
 module.exports = {
@@ -377,7 +331,7 @@ module.exports = {
     getuser,
     login,
     profileupdate,
-   
+    image,
     find,
     successfullsign,
     public,

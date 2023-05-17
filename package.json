@@ -18,6 +18,8 @@
     "mysql": "^2.18.1",
     "nodemailer": "^6.9.1",
     "objection": "^3.0.1",
-    "timestamp": "^0.0.1"
+    "path": "^0.12.7",
+    "timestamp": "^0.0.1",
+    "valid-url": "^1.0.9"
   }
 }

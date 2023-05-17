@@ -20,7 +20,6 @@ exports.up = function(knex) {
         table.integer("CollegePercentage");
         table.integer("CollegePassedOutYear");
         table.integer("WorkExperience");
-        table.integer("Jobsapplied");
         table.string("Job");
         table.string("Company");
         table.string("Role").defaultTo("user");
@@ -28,6 +27,7 @@ exports.up = function(knex) {
         table.integer("Connect");
         table.integer('OTP');
         table.string('block')
+        table.string('profile')
         table.timestamp('created_at').defaultTo(knex.fn.now())
         table.timestamp('updated_at').defaultTo(knex.fn.now())
 
