@@ -5,6 +5,7 @@ const bcrypt = require("bcrypt");
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
+const { Console, profile } = require("console");
 
 
 //OTP generation
@@ -57,12 +58,12 @@ const adduser = async (req, res) => {
         let basic = {
             Email: req.body.Email,
             Password: password,
-            UserName: req.body.UserName,
+           
             OTP: OTP
         }
         const data = await Users.query().insert(basic)
         sendmail(req.body.Email, OTP);
-        res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
+        res.status(200).send({ status: 200, message: "OTP sent please verify you're email",data:"your id"+" "+data.id });
 
     }
     catch (err) {
@@ -78,6 +79,7 @@ const successfullsign = async (req, res) => {
     
     try {
         let basic = {
+            
             Email: req.body.Email,
              OTP: req.body.OTP
         }
@@ -90,7 +92,7 @@ const successfullsign = async (req, res) => {
             console.log(user.id)
             const user1 = await Users.query().findOne({
                 Email: basic.Email,
-            })
+            }).update(req.body)
             console.log(user1)
             res.status(200).send({ status: 200, message: "OTP Verified",data:user1 });
 
@@ -119,49 +121,17 @@ const getuser = async (req, res) => {
 }
 
 // login to generate token 
-const login = async (req, res) => {
+const login = async (req, res) => 
+{
     try {
         Email = req.body.Email;
         
         Password = req.body.Password;
-        
-
-        let result = await Users.query().findOne({
-            Email: Email
-        })
-        if(result.Role=="user"){
-            if (result) {
-                const user = { Email: result.Email, Password: result.Password };
-     
-                 const token = jwt.sign(user, secretkey)
-                 console.log("user", user)
-                 console.log("token", token)
-                 //return res.json({ token: token, result: result })
-                 res.status(200).send({ status: 200, message: "Login success",token:token,result:result });
-                }
-     
-             res.status(403).send({ status: 403, message: "Enter a valid Username and Password" });
-
-        }
-        else{
-            if (result) {
-                const user = { Email: result.Email, Password: result.Password };
-     
-                 const token = jwt.sign(user, secretkey)
-                 console.log("user", user)
-                 console.log("token", token)
-                 res.status(200).send({ status: 200, message: "Logined as Admin",token:token,result:result });
-                 
-     
-             }
-     
-             res.status(404).send({ status: 404, message: "Enter a valid Username and Password" });
-
-        }
-        
-
-
-    }
+    
+                const token = jwt.sign(req.body, secretkey)
+                 res.status(200).send({ status: 200, message: "Login success",token:token });
+                
+     }
     catch (err) {
         res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
@@ -173,12 +143,12 @@ const login = async (req, res) => {
 //public or private
 const public=async(req,res)=>{
     try{
-        let id=req.body.id;
+        let Email=req.body.Email;
         
 
-    const user = await Users.query().findById(id).update(req.body)
+    const user = await Users.query().findOne({Email:Email}).update(req.body)
 
-    res.status(200).send({ status: 200, message: "Private mode Enabled",data:user });
+    res.status(200).send({ status: 200, message: "Private mode Enabled"});
 
     }
     catch(err){
@@ -195,28 +165,69 @@ const public=async(req,res)=>{
 
 const profileupdate = async (req, res) => {
     try {
-        let basic={
-            
-            Email:req.body.Email
+        let basic={Email:req.body.Email,OTP: OTP}
+        let id=req.params.id
+        const user1 = await Users.query().findById(id)
+        
+
+        if(user1.Email==basic.Email){
+            const user = await Users.query().findById(id).update(req.body)
+         
+           
+
+            res.status(200).send({ status: 200, message: "Updated Successfully", data: req.body})
 
         }
-        let id=req.params.id
-        
-  
-            const user = await Users.query().findById(id).update(req.body)
+        else{
+            sendmail(req.body.Email, OTP);
+            console.log(OTP)
+            let num={OTP:OTP}
+            const user = await Users.query().findById(id).update(num)
+           
+             res.status(404).send({ status: 404, message: "mail has been changed ,please verify  mail before update"})
 
-            res.status(200).send({ status: 200, message: "User Data Updated Successfully", data: user })
-
-       
-
-
-        
-
-    }
+        }
+}
     catch (err) {
+      
         res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
     }
 }
+
+// COMPLETE SIGN-UP USING OTP VERIFICATION 
+const vryemailchange = async (req, res) => {
+    
+    try {
+        let basic = {
+            
+            id: req.body.id,
+             OTP: req.body.OTP
+        }
+        const user = await Users.query().findOne({
+            id: basic.id,
+            OTP: basic.OTP
+        })
+        console.log(user.OTP + OTP)
+        if (OTP == user.OTP) {
+            console.log(user.id)
+            const user1 = await Users.query().findOne({
+                id: basic.id,
+            }).update(req.body)
+            console.log(user1)
+            res.status(200).send({ status: 200, message: "OTP Verified",data:user1 });
+
+        }
+        else {
+            res.status(403).send({ status: 403, message: "OTP Invalid" });
+
+        }
+    }
+    catch (err){
+        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+
+    }
+}
+
 
 
 
@@ -306,7 +317,7 @@ const image = async (req, res) => {
                 console.log(basic)
                 if (extn != null) {
                     let result = await Users.query().findOne({id:req.params.id}).update(basic)
-                    res.status(200).send({ status: 200, message: "image added Successfully", data: result })
+                    res.status(200).send({ status: 200, message: "image added Successfully", data:basic})
 
                 }
                 else {
@@ -336,5 +347,6 @@ module.exports = {
     successfullsign,
     public,
     block,
+    vryemailchange
    
 }

@@ -1,15 +1,16 @@
 const router1= require('express').Router()
 const postservice= require("../services/postservice.js")
+const usrauth= require("../authen/user_authen.js")
 
 
+router1.post('/text',usrauth.authenticateToken,postservice.addtext)
+router1.post('/job',usrauth.authenticateToken,postservice.addjob)
+router1.get('/getalljob',usrauth.authenticateToken,postservice.getjob)
+router1.get('/getallpost',usrauth.authenticateToken,postservice.postdetail)
 
-router1.post('/text',postservice.addtext)
-router1.post('/job',postservice.addjob)
-router1.get('/getalljob',postservice.getjob)
-
-router1.post('/link',postservice.link)
-router1.post('/image',postservice.image)
-router1.post('/uploadall',postservice.uploadall)
+router1.post('/link',usrauth.authenticateToken,postservice.link)
+router1.post('/image',usrauth.authenticateToken,postservice.image)
+router1.post('/uploadall',usrauth.authenticateToken,postservice.uploadall)
 
 
 

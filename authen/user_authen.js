@@ -14,21 +14,20 @@ exports.authenticateToken = (req, res, next) => {
     jwt.verify(token, secretkey, async (err, user) => {
         if (err) {
             return res.status(403).send({ status: 403, message: "Token Invalid" });
-        }
-
-
-
-        else {
-            try {
-                let jwt_role = await db.query().findOne({
             
-                    Email:user.Email,
-                   
-                
-               
-            })
+        }
+       else {
 
-                if (jwt_role.Role == "admin") {
+            try {
+                
+                
+
+                let jwt_role = await db.query().findOne({Email:user.Email})
+                
+                
+
+                if (jwt_role.Role == "user") {
+                    
                     next();
                 }
                 else {
@@ -37,6 +36,7 @@ exports.authenticateToken = (req, res, next) => {
 
             }
             catch(error){
+                console.log(error)
                 res.status(404).send(JSON.stringify('API Response error'+error))
 
             }

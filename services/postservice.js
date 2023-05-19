@@ -114,8 +114,9 @@ const image = async (req, res) => {
             }
             else {
                 let basic = {
-                    users_id: req.body.users_id,
-                    image: new Date() + extn
+                    users_id:req.body.users_id,
+                    
+                    image: req.body.users_id+new Date() + extn
                 }
                 if (extn != null) {
                     const data = await post.query().insert(basic)
@@ -206,6 +207,17 @@ const uploadall = async (req, res) => {
 }
 
 
+const postdetail = async (req, res) => {
+    let users_id=req.body.users_id
+    
+
+    const user = await post.query().where("users_id",users_id)
+    res.status(200).send({ status: 200, message: "post detail", data: user })
+}
+
+
+
+
 
 
 //Post a job
@@ -242,8 +254,8 @@ const addjob = async (req, res) => {
 
 // Get all the jobs
 const getjob = async (req, res) => {
-    const user = await post.query();
-    res.status(200).send({ status: 200, message: "JOb Posted Successfully", data: user })
+    const user = await post.query().where('JobTitle','!=','');
+    res.status(200).send({ status: 200, message: "Job dtails", data: user })
 }
 
 
@@ -255,5 +267,6 @@ module.exports = {
     getjob,
     link,
     image,
-    uploadall
+    uploadall,
+    postdetail
 }

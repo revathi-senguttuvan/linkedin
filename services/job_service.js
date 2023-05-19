@@ -54,42 +54,45 @@ const jobapplied = async (req, res) => {
 
         }
         const user2 = await post.query().findById(detail.post_id)
-        const find = await job.query().findOne({ post_id: detail.post_id })
+        console.log(user2)
+        
+        //const find = await job.query().findOne({ post_id: detail.post_id })
+        const find = await job.query()
         console.log(find)
-       
+       if(find.post_id=='')
+       {
+        const data = await job.query().insert(detail);
+        users_id = detail.users_id
+        const user1 = await post.query().findById(detail.post_id)
+        user1.no_of_persons = user1.no_of_persons + 1
+        console.log(user1.Email)
+
+        const sendmsg = await Users.query().findById(detail.users_id)
+        sendmail(user1.Email, sendmsg);
+        console.log(sendmsg)
+        const user = await post.query().findById(detail.post_id).update(user1)
+        res.status(200).send({ status: 200, message: "Data added success!", data: data })
+        
+
+       }
+       else{
         if (user2.users_id != detail.users_id) {
             if (find.Email != detail.Email) {
                 if (user2.JobPosition != user2.no_of_persons) {
-                    console.log(user2.JobPosition)
-                    console.log(user2.no_of_persons)
-                    console.log(user2.JobPosition != user2.no_of_persons)
-                    console.log(user2.JobPosition == user2.no_of_persons)
-
-                    console.log(user2.no_of_persons >= user2.JobPosition)
-                    console.log(user2.no_of_persons <= user2.JobPosition)
+                    
 
                     const data = await job.query().insert(detail);
                     users_id = detail.users_id
-
-
-
-
                     const user1 = await post.query().findById(detail.post_id)
                     user1.no_of_persons = user1.no_of_persons + 1
                     console.log(user1.Email)
 
                     const sendmsg = await Users.query().findById(detail.users_id)
-
-
-
-
                     sendmail(user1.Email, sendmsg);
                     console.log(sendmsg)
-
-
                     const user = await post.query().findById(detail.post_id).update(user1)
                     res.status(200).send({ status: 200, message: "Data added success!", data: data })
-                    res.status(200).send({ status: 200, message: "Data added success!" })
+                    
 
                 }
                 else {
@@ -106,8 +109,12 @@ const jobapplied = async (req, res) => {
             res.status(200).send({ status: 200, message: "Invalid inputs" })
 
         }
+    
+
+       }
     }
     catch (err) {
+        console.log(err)
       res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
 
     }
