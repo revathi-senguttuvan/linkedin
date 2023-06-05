@@ -59,7 +59,7 @@ const jobapplied = async (req, res) => {
         //const find = await job.query().findOne({ post_id: detail.post_id })
         const find = await job.query()
         console.log(find)
-       if(find.post_id=='')
+       if(find.post_id=='')// check for post equal to null
        {
         const data = await job.query().insert(detail);
         users_id = detail.users_id
@@ -75,10 +75,13 @@ const jobapplied = async (req, res) => {
         
 
        }
-       else{
-        if (user2.users_id != detail.users_id) {
-            if (find.Email != detail.Email) {
-                if (user2.JobPosition != user2.no_of_persons) {
+       else{//if post already exist
+        if (user2.users_id != detail.users_id) //checks the applicant userid and  post user id not same
+        {
+            if (find.Email != detail.Email)//checks for the user who as already applied using email
+             {
+                if (user2.JobPosition != user2.no_of_persons) //checks for openings 
+                {
                     
 
                     const data = await job.query().insert(detail);
