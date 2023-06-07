@@ -258,7 +258,31 @@ const getjob = async (req, res) => {
     res.status(200).send({ status: 200, message: "Job dtails", data: user })
 }
 
+const deletepost = async (req, res) => {
+   let basic = {
+       
+        users_id: req.body.users_id
+    }
 
+    const userdetail = await post.query().findOne({users_id:basic.users_id}).delete()
+   // if(users_id==userdetail.users_id )
+   console.log(userdetail)
+   console.log(basic.users_id)
+
+    const user = await post.query().where('JobTitle',null)
+    console.log(user)
+  
+    console.log(user.users_id)
+
+    res.status(200).send({ status: 200, message: "Job dtails", data: user })
+}
+
+const deletejob = async (req, res) => {
+
+    const user = await post.query().where('JobTitle','!=','').delete();
+    console.log(user)
+    res.status(200).send({ status: 200, message: "Successfully deleted"})
+}
 
 
 module.exports = {
@@ -268,5 +292,7 @@ module.exports = {
     link,
     image,
     uploadall,
-    postdetail
+    postdetail,
+    deletepost,
+    deletejob
 }

@@ -11,6 +11,8 @@ router1.get('/getallpost',usrauth.authenticateToken,postservice.postdetail)
 router1.post('/link',usrauth.authenticateToken,postservice.link)
 router1.post('/image',usrauth.authenticateToken,postservice.image)
 router1.post('/uploadall',usrauth.authenticateToken,postservice.uploadall)
+router1.delete('/deletepost',usrauth.authenticateToken,postservice.deletepost)
+router1.delete('/deletejob',usrauth.authenticateToken,postservice.deletejob)
 
 
 

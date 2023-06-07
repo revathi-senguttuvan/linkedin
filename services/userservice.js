@@ -1,15 +1,16 @@
 const Users = require("../models/user");
+const validate=require("../Helperfile/help.js")
 const jwt = require("jsonwebtoken")
-secretkey = "secretkey"
+let secretkey = "secretkey"
 const bcrypt = require("bcrypt");
 const multer = require('multer');
 const path = require('path');
 const nodemailer = require('nodemailer');
-const { Console, profile } = require("console");
+
 
 
 //OTP generation
-var digits = '0123456789';
+let digits = '0123456789';
 let OTP = '';
 for (let i = 0; i < 4; i++) {
     OTP += digits[Math.floor(Math.random() * 10)];
@@ -29,7 +30,7 @@ function sendmail(toMail, otp) {
         from: 'revathi@xponential.digital',
         to: toMail,
         subject: 'New Account created',
-        text: `There is your OTP : ${OTP}`
+        text: `There is your OTP : ${otp}`
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
@@ -54,20 +55,23 @@ function sendmail(toMail, otp) {
 const adduser = async (req, res) => {
     const password = await bcrypt.hash(req.body.Password, 6)
     try {
+        
 
         let basic = {
             Email: req.body.Email,
             Password: password,
-           
-            OTP: OTP
+            UserName:req.body.UserName,
+            OTP:  validate.otp(OTP)
         }
+        // console.log(validate.otp(OTP))
         const data = await Users.query().insert(basic)
-        sendmail(req.body.Email, OTP);
+        sendmail(req.body.Email, basic.OTP);
+        console.log(basic.OTP)
         res.status(200).send({ status: 200, message: "OTP sent please verify you're email",data:"your id"+" "+data.id });
 
     }
     catch (err) {
-        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+        res.status(400).send({ status: 400, message: "Data not Updated", data: "" + err })
 
     }
 
@@ -87,14 +91,14 @@ const successfullsign = async (req, res) => {
             Email: basic.Email,
             OTP: basic.OTP
         })
-        console.log(user.OTP + OTP)
-        if (OTP == user.OTP) {
+        console.log(user.OTP + basic.OTP)
+        if (basic.OTP == user.OTP) {
             console.log(user.id)
             const user1 = await Users.query().findOne({
                 Email: basic.Email,
             }).update(req.body)
             console.log(user1)
-            res.status(200).send({ status: 200, message: "OTP Verified",data:user1 });
+            res.status(200).send({ status: 200, message: "OTP Verified",data:null });
 
         }
         else {

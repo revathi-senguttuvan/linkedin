@@ -50,6 +50,8 @@ const jobapplied = async (req, res) => {
             users_id: req.body.users_id,
             post_id: req.body.post_id,
             Email: req.body.Email,
+            ownermail: req.body.ownermail,
+         
             Status: req.body.Status
 
         }

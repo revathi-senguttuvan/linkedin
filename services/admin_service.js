@@ -1,7 +1,7 @@
 const Users = require("../models/user");
 const post = require("../models/post");
 const job = require("../models/job");
-const connect= require("../models/connect");
+const connect = require("../models/connect");
 const nodemailer = require('nodemailer');
 const bcrypt = require("bcrypt");
 
@@ -44,7 +44,7 @@ const addadmin = async (req, res) => {
             Email: req.body.Email,
             Password: password,
             UserName: req.body.UserName,
-            Role:req.body.Role,
+            Role: req.body.Role,
             OTP: OTP
 
         }
@@ -53,7 +53,7 @@ const addadmin = async (req, res) => {
         res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
     }
     catch (err) {
-        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
 
     }
 }
@@ -63,7 +63,7 @@ const successfullsign = async (req, res) => {
     try {
         let basic = {
             Email: req.body.Email,
-             OTP: req.body.OTP
+            OTP: req.body.OTP
         }
         const user = await Users.query().findOne({
             Email: basic.Email,
@@ -76,7 +76,7 @@ const successfullsign = async (req, res) => {
                 Email: basic.Email,
             })
             console.log(user1)
-            res.status(200).send({ status: 200, message: "OTP Verified",data:user1 });
+            res.status(200).send({ status: 200, message: "OTP Verified", data: user1 });
 
         }
         else {
@@ -84,40 +84,60 @@ const successfullsign = async (req, res) => {
 
         }
     }
-    catch (err){
-        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+    catch (err) {
+        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
 
     }
 }
 
 //deleteuser
 const deltuser = async (req, res) => {
-   try {
-    let basic = {
-            Email: req.body.Email,
-            id:req.body.id
+    try {
+        let basic = {
+
+            id: req.body.id,
+            Email: req.body.Email
         }
-        const data1=await post.query().where({users_id:basic.id}).delete()
-        console.log(data1)
-        const data2=await job.query().where({users_id:basic.id}).delete()
-        console.log(data2)
-        const data3=await connect.query().where({personid:basic.id}).delete()
-        console.log(data3)
-        const data44=await connect.query().where({requestedto:basic.id}).delete()
-        console.log(data44)
-        const data4=await Users.query().where({id:basic.id}).delete()
-        console.log(data4)
-        res.status(200).send({ status: 200, message: "user has been deleted" });
+        const finduser = await Users.query().where({ id: basic.id })
+        if (finduser != 0) {
+            const data22 = await job.query().where({ ownermail: basic.Email })
+            console.log(data22)
+
+
+
+
+
+            const data2 = await job.query().where({ ownermail: basic.Email }).delete()
+            console.log(data2)
+
+            const data1 = await post.query().where({ users_id: basic.id }).delete()
+            console.log(data1)
+
+
+            const data3 = await connect.query().where({ personid: basic.id }).delete()
+            console.log(data3)
+            const data44 = await connect.query().where({ requestedto: basic.id }).delete()
+            console.log(data44)
+            const data444 = await connect.query().where({ connectedto: basic.id }).delete()
+            console.log(data444)
+            const data4 = await Users.query().where({ id: basic.id }).delete()
+            console.log(data4)
+            res.status(200).send({ status: 200, message: "user has been deleted" });
+        }
+        else {
+            res.status(404).send({ status: 404, message: "no such user" })
+
+        }
 
     }
     catch (err) {
-        res.status(404).send({ status: 404, message: "Data not Updated", data: "" + err })
+        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
 
     }
 
 }
 
-module.exports={
+module.exports = {
     addadmin,
     successfullsign,
     deltuser

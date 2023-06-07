@@ -8,6 +8,7 @@ exports.up = function(knex) {
         table.integer("users_id").unsigned();
         table.integer("post_id").unsigned();
         table.string('Email');
+        table.string('ownermail');
         table.string('Status')
         table.timestamp('created_at').defaultTo(knex.fn.now())
         table.timestamp('updated_at').defaultTo(knex.fn.now())

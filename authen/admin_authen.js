@@ -6,8 +6,7 @@ secretkey="secretkey"
 exports.authenticateToken = (req, res, next) => {
 
     const token = req.headers['authorization'];
-    console.log(token)
-    console.log(!token)
+   
 
     if (!token) {
         return res.send({ status: 404, message: " Token Not Present , please enter token!!" });
