@@ -19,7 +19,7 @@ const addtext = async (req, res) => {
             res.status(200).send({ status: 200, message: "Text added Successfully", data: data })
         }
         else {
-            res.status(204).send({ status: 204, message: "Please  add some text" })
+            res.status(200).send({ status: 200, message: "Please  add some text" })
         }
     }
     catch (err) {
@@ -41,7 +41,7 @@ const link = async (req, res) => {
                 res.status(200).send({ status: 200, message: "Link added Successfully", data: data })
             }
             else {
-                res.status(204).send({ status: 204, message: "Please  add some link" })
+                res.status(200).send({ status: 200, message: "Please  add some link" })
             }
         } else {
             res.status(400).send({ status: 400, message: "It's not an link" })
@@ -99,7 +99,7 @@ const image = async (req, res) => {
                     res.status(200).send({ status: 200, message: "image added Successfully", data: data })
                 }
                 else {
-                    res.status(204).send({ status: 204, message: "No image added " })
+                    res.status(200).send({ status: 200, message: "No image added " })
                 }
             }
         })
@@ -134,7 +134,7 @@ const uploadall = async (req, res) => {
                     }
                 }
                 else {
-                    res.status(204).send({ status: 204, message: "no image added" })
+                    res.status(200).send({ status: 200, message: "no image added" })
                 }
             }
         })

@@ -113,7 +113,7 @@ const getaccept = async (req, res) => {
         let basic = {
             personid: req.body.personid
         }
-        const find1 = await con_src.finduser_where('personid', req.body.personid)
+        const find1 = await con_src.finduser_where(personid, req.body.personid)
 
         if (find1.length > 0) {
             const find = await con_src.finduser_where2(basic.personid)
@@ -129,7 +129,7 @@ const getaccept = async (req, res) => {
 }
 
 
-//accept the connect request
+//accept the connect request//
 const accept = async (req, res) => {
     try {
         let basic =

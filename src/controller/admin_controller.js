@@ -115,7 +115,7 @@ const deltuser = async (req, res) => {
             res.status(200).send({ status: 200, message: "user has been deleted" });
         }
         else {
-            res.status(404).send({ status: 404, message: "no such user" })
+            res.status(200).send({ status: 200, message: "no such user" })
 
         }
     }
