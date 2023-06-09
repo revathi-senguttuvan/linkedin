@@ -1,5 +1,5 @@
 const {Model}=require('objection');
-const knex=require('../config/dbConfig');
+const knex=require('../../config/dbConfig');
 Model.knex(knex);
 
 class Users extends Model{
@@ -12,7 +12,7 @@ class Users extends Model{
            
             properties: {
                 id: { type: 'integer' },
-                user_id: { type: 'integer' },
+                users_id: { type: 'integer' },
                 post_id: { type: 'integer' },
                 Email: { type: 'string' },
                 Status: { type: 'string' },

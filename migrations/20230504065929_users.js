@@ -23,7 +23,7 @@ exports.up = function(knex) {
         table.string("Job");
         table.string("Company");
         table.string("Role").defaultTo("user");
-        table.bigInteger("Phone Number");
+        table.bigInteger("PhoneNumber");
         table.integer("Connect");
         table.integer('OTP');
         table.string('block')

@@ -1,16 +1,19 @@
+const nodemailer = require('nodemailer');
+const bcrypt = require("bcrypt");
 const Users = require("../models/user");
 const post = require("../models/post");
 const job = require("../models/job");
 const connect = require("../models/connect");
-const nodemailer = require('nodemailer');
-const bcrypt = require("bcrypt");
+const usr_src = require("../service/user_service");
+const con_src = require("../service/connect_service");
+const post_src = require("../service/post_service");
+const job_src = require("../service/job_service");
+const validate = require("../Helperfile/help.js");
+const email = require("../Template/EmailFormat.js");
 
-//OTP generation
-var digits = '0123456789';
-let OTP = '';
-for (let i = 0; i < 4; i++) {
-    OTP += digits[Math.floor(Math.random() * 10)];
-}
+
+
+
 //mail generation
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -39,21 +42,19 @@ function sendmail(toMail, otp) {
 const addadmin = async (req, res) => {
     const password = await bcrypt.hash(req.body.Password, 6)
     try {
-
         let basic = {
             Email: req.body.Email,
             Password: password,
             UserName: req.body.UserName,
             Role: req.body.Role,
-            OTP: OTP
-
+            OTP: validate.otp()
         }
-        const data = await Users.query().insert(basic)
-        sendmail(req.body.Email, OTP);
+        const data = await usr_src.finduser_insert(basic)
+        email.sendmail(req.body.Email, basic.OTP);
         res.status(200).send({ status: 200, message: "OTP sent please verify you're email" });
     }
     catch (err) {
-        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
+        res.status(400).send({ status: 400, message: "Data not Updated", data: "" + err })
 
     }
 }
@@ -61,31 +62,30 @@ const addadmin = async (req, res) => {
 //verify
 const successfullsign = async (req, res) => {
     try {
+        console.log("shj")
         let basic = {
             Email: req.body.Email,
             OTP: req.body.OTP
         }
-        const user = await Users.query().findOne({
+        const user = await usr_src.finduser2({
             Email: basic.Email,
             OTP: basic.OTP
         })
-        console.log(user.OTP + OTP)
-        if (OTP == user.OTP) {
-            console.log(user.id)
-            const user1 = await Users.query().findOne({
+        console.log(user)
+       
+        if (basic.OTP == user.OTP) {
+            const user1 = await usr_src.finduser({
                 Email: basic.Email,
             })
             console.log(user1)
             res.status(200).send({ status: 200, message: "OTP Verified", data: user1 });
-
         }
         else {
-            res.status(403).send({ status: 403, message: "OTP Invalid" });
-
+            res.status(200).send({ status: 200, message: "OTP Invalid" });
         }
     }
     catch (err) {
-        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
+        res.status(400).send({ status: 400, message: "Data not Updated", data: "" + err })
 
     }
 }
@@ -94,47 +94,35 @@ const successfullsign = async (req, res) => {
 const deltuser = async (req, res) => {
     try {
         let basic = {
-
             id: req.body.id,
             Email: req.body.Email
         }
-        const finduser = await Users.query().where({ id: basic.id })
+        const finduser = await usr_src.finduser_where({ id: basic.id })
+        console.log(finduser)
         if (finduser != 0) {
-            const data22 = await job.query().where({ ownermail: basic.Email })
-            console.log(data22)
-
-
-
-
-
-            const data2 = await job.query().where({ ownermail: basic.Email }).delete()
-            console.log(data2)
-
-            const data1 = await post.query().where({ users_id: basic.id }).delete()
-            console.log(data1)
-
-
-            const data3 = await connect.query().where({ personid: basic.id }).delete()
-            console.log(data3)
-            const data44 = await connect.query().where({ requestedto: basic.id }).delete()
-            console.log(data44)
-            const data444 = await connect.query().where({ connectedto: basic.id }).delete()
-            console.log(data444)
-            const data4 = await Users.query().where({ id: basic.id }).delete()
-            console.log(data4)
+            const dltJobApplied = await job_src.job_wheredel(basic.Email )
+            console.log(dltJobApplied)
+            const dltPost = await post_src.usr_wheredel(basic.id )
+            console.log(dltPost)
+            const dltPersonID = await con_src.usr_wheredel1(basic.id )
+            console.log(dltPersonID)
+            const dltRequested = await con_src.usr_wheredel11( basic.id )
+            console.log(dltRequested)
+            const dltConnected = await con_src.usr_wheredel111(basic.id )
+            console.log(dltConnected)
+            const dltUser = await usr_src.usr_wheredel(basic.id )
+            console.log(dltUser)
             res.status(200).send({ status: 200, message: "user has been deleted" });
         }
         else {
             res.status(404).send({ status: 404, message: "no such user" })
 
         }
-
     }
     catch (err) {
-        res.status(500).send({ status: 500, message: "Data not Updated", data: "" + err })
-
+        res.status(400).send({ status: 400, message: "Data not Updated", data: "" + err })
+       
     }
-
 }
 
 module.exports = {

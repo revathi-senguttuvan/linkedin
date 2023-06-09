@@ -2,16 +2,20 @@
 
 /**
  * @type { Object.<string, import("knex").Knex.Config> }
+ * 
  */
+require('dotenv').config();
 module.exports = {
 
   development: {
     client: 'mysql',
     connection: {
-      database: 'li_db',
-      user:     'root',
-      password: '12345'
+      database: process.env.database,
+      user:     process.env.user,
+      password: process.env.password
+      
     }
+    
   },
 
   staging: {

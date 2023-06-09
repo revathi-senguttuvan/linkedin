@@ -1,5 +1,6 @@
 const {Model}=require('objection');
-const knex=require('../config/dbConfig');
+const knex=require('../../config/dbConfig');
+
 Model.knex(knex);
 
 class Users extends Model{
